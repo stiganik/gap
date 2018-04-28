@@ -10,7 +10,7 @@ This means that the "master" branch will contain stable released versions of the
 
 ## Quick start
 
-A somewhat trivial example will generate a 1 byte solution where having a higher byte value is favored by the fitness function. It will stop after 10 minutes or when a fitness of 255 is reached. Usually this will not get past generation 0 since a byte 255 is generated randomly with high probability when seeding the pool.
+A somewhat trivial example will generate a 1 byte solution where having a higher byte value is favored by the fitness function. It will stop after 1 minute or when a fitness of 255 is reached. Usually this will not get past generation 0 since a terminating solution (255) is generated with high probability while seeding the solution pool with random values.
 
 ```go
 package main
