@@ -180,8 +180,9 @@ gap.Algorithm{
 Elitism is a pointer to a value between 0 and 100 that determines which percentage of the best solutions of each generation pass on to the next generation unaltered. By default this value is set to `3`.
 
 ```go
+elite := uint(10)
 gap.Algorithm{
-    Elitism: &uint(10), // 10% of the elite pass on without selection and altering
+    Elitism: &elite, // 10% of the elite pass on without selection and altering
 }
 ```
 
@@ -224,11 +225,12 @@ func Fitness(s []byte) uint {
 }
 
 func main() {
+    elite := uint(10)
     alg := gap.Algorithm{
         FFn:              Fitness,
-        SolutionBitSize:  sbl,
+        SolutionBitSize:  uint(8),
         SolutionPoolSize: 10000,
-        Elitism:          &uint(10),
+        Elitism:          &elite,
         CombinationAlgorithms: []combination.Algorithm{
             combination.CROSSOVER_SINGLE_POINT,
             combination.MUTATION_BIT_STRING,
