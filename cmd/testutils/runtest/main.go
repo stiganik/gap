@@ -32,13 +32,16 @@ func Fitness(s []byte) uint {
 }
 
 func main() {
-	alg := gap.New(Fitness, solutionSize)
-	alg.SolutionPoolSize = 10000
+	alg := gap.Algorithm{
+		FFn:              Fitness,
+		SolutionBitSize:  solutionSize,
+		SolutionPoolSize: 10000,
+	}
 
 	res, err := alg.Run(gap.Goal{
 		Goals: gap.TIME | gap.FITNESS,
 		TimeN: 10 * time.Minute,
-		FitN:  100,
+		FitN:  solutionSize,
 	})
 
 	if err != nil {
