@@ -15,17 +15,17 @@ const (
 	// using the TimeN field in the goal structure which requests a graceful
 	// stop from the algorithm after the time elapses. NOTE: The graceful
 	// shutdown may take a while after the timer elapses.
-	TIME GoalFlag = 1
+	TIME GoalFlag = 1 << iota
 
 	// GENERATION is a goal type flag. It starts counting generations and
 	// ends the algorithm after the amount of generations specified in the
 	// goal structure field GenN has been completed.
-	GENERATION GoalFlag = 2
+	GENERATION
 
 	// FITNESS is a goal type flag. It monitors the fitness of all
 	// solutions and stops the algorithm after the fitness specified in the
 	// goal structure field FitN has been achieved.
-	FITNESS GoalFlag = 4
+	FITNESS
 )
 
 // Goal is a structure that contains information about the goals of the

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/stiganik/gap/selector"
+	"github.com/stiganik/gap/selection"
 	"github.com/stiganik/gap/solution"
 
-	_ "github.com/stiganik/gap/selector/all"
+	_ "github.com/stiganik/gap/selection/all"
 )
 
 const (
@@ -16,7 +16,7 @@ const (
 	elitism      = 10
 )
 
-var tests = []selector.Algorithm{selector.SCX}
+var tests = []selection.Algorithm{selection.SCX}
 
 func main() {
 	poolA := solution.NewPool(poolSize, solutionSize)
@@ -43,7 +43,7 @@ func main() {
 	for _, test := range tests {
 		fmt.Println("\nAlgorithm:", string(test))
 
-		sel, err := selector.New(test, elitism)
+		sel, err := selection.New(test, elitism)
 		if err != nil {
 			fmt.Println("Failed to create select algorithm:", err)
 			os.Exit(1)

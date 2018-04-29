@@ -1,4 +1,4 @@
-Genetic Algorithm Project. (GAP)
+Genetic Algorithm Project. (GAP v0.2)
 
 This project aims to implement a Go based genetic algorithm package. The interface is designed to be simple to use for both beginners (default values) and advanced users (customizable).
 
@@ -10,7 +10,7 @@ This means that the "master" branch will contain stable released versions of the
 
 ## Quick start
 
-A somewhat trivial example will generate a 1 byte solution where having a higher byte value is favored by the fitness function. It will stop after 10 minutes or when a fitness of 255 is reached. Usually this will not get past generation 0 since a byte 255 is generated randomly with high probability when seeding the pool.
+A somewhat trivial example will generate a 1 byte solution where having a higher byte value is favored by the fitness function. It will stop after 1 minute or when a fitness of 255 is reached. Usually this will not get past generation 0 since a terminating solution (255) is generated with high probability while seeding the solution pool with random values.
 
 ```go
 package main
@@ -28,10 +28,12 @@ func Fitness(s []byte) uint {
 }
 
 func main() {
-    solutionBits := uint(8)
-    alg := gap.New(Fitness, solutionBits)
+    alg := gap.Algorithm {
+        FFn: Fitness,
+        SolutionBitSize: uint(8),
+    }
 
-    goal := gap.Goal{
+    goal := gap.Goal {
         Goals: gap.TIME | gap.FITNESS,
         TimeN: 1 * time.Minute,
         FitN:  255,
@@ -76,6 +78,16 @@ Currently implemented algorithms.
 - Flip bit mutation - The flip bit string mutation algorithm flips all the
   bits in the bitstring without looking into it further.
   https://en.wikipedia.org/wiki/Mutation_(genetic_algorithm)
+
+## Constructor
+
+While the `Algorithm` structure is usually initialized manually, the package does provide a constructor in case you need a function to create a new algorithm for whatever reason. The function has the signature:
+
+```go
+func New(fn FitnessFn, sbl uint) *Algorithm
+```
+
+where `sbl` is the solution bit size.
 
 ## Customization
 
@@ -165,21 +177,22 @@ gap.Algorithm{
 
 #### Elitism
 
-Elitism is a value between 0 and 100 that determines which percentage of the best solutions of each generation pass on to the next generation unaltered. By default this value is set to `3`.
+Elitism is a pointer to a value between 0 and 100 that determines which percentage of the best solutions of each generation pass on to the next generation unaltered. By default this value is set to `3`.
 
 ```go
+elite := uint(10)
 gap.Algorithm{
-    Elitism: 10, // 10% of the elite pass on without selection and altering
+    Elitism: &elite, // 10% of the elite pass on without selection and altering
 }
 ```
 
 #### Selection algorithm
 
-The selection algorithm determines which algorithm is used to choose solutions from the possible solutions into the next generation. By default this value is set to `selector.SCX`
+The selection algorithm determines which algorithm is used to choose solutions from the possible solutions into the next generation. By default this value is set to `selection.SCX`
 
 ```go
 gap.Algorithm{
-    SelectionAlgorithm: selector.SCX, // Use fitness proportionate selection algorithm
+    SelectionAlgorithm: selection.SCX, // Use fitness proportionate selection algorithm
 }
 ```
 
@@ -212,13 +225,16 @@ func Fitness(s []byte) uint {
 }
 
 func main() {
-    alg := gap.New(Fitness, sbl)
-
-    alg.SolutionPoolSize = 10000
-    alg.Elitism = 10
-    alg.CombinationAlgorithms = []combination.Algorithm{
-        combination.CROSSOVER_SINGLE_POINT,
-        combination.MUTATION_BIT_STRING,
+    elite := uint(10)
+    alg := gap.Algorithm{
+        FFn:              Fitness,
+        SolutionBitSize:  uint(8),
+        SolutionPoolSize: 10000,
+        Elitism:          &elite,
+        CombinationAlgorithms: []combination.Algorithm{
+            combination.CROSSOVER_SINGLE_POINT,
+            combination.MUTATION_BIT_STRING,
+        },
     }
 }
 ```

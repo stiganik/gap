@@ -10,13 +10,23 @@ import (
 	"time"
 
 	"github.com/stiganik/gap/combination"
-	"github.com/stiganik/gap/selector"
+	"github.com/stiganik/gap/selection"
 	"github.com/stiganik/gap/solution"
 
 	// Statically import all selection and combination algorithms to make
 	// them register themselves at runtime.
 	_ "github.com/stiganik/gap/combination/all"
-	_ "github.com/stiganik/gap/selector/all"
+	_ "github.com/stiganik/gap/selection/all"
+)
+
+var (
+	defaultPoolSize       = uint(1000)
+	defaultElitism        = uint(3)
+	defaultSelectionAlg   = selection.SCX
+	defaultCombinationAlg = []combination.Algorithm{
+		combination.CROSSOVER_SINGLE_POINT,
+	}
+	defaultThreadCount = uint(runtime.NumCPU())
 )
 
 // FitnessFn defines a fitness function which takes in a solution in the form of
@@ -34,21 +44,23 @@ type Algorithm struct {
 	SolutionBitSize uint
 
 	// SolutionPoolSize is the amount of solutions generated in each
-	// iteration of the alogirthm.
+	// iteration of the alogirthm. The default value is 1000.
 	SolutionPoolSize uint
 
-	// Elitism is the percentage of values that pass on to the next
-	// generation without the selection and combination process. The value
-	// will be clipped between 0 and 100.
-	Elitism uint
+	// Elitism is the percentage of values that pass on to the next generation
+	// without the selection and combination process. The value will be clipped
+	// between 0 and 100. If the value is nil the default value is used. The
+	// default value is 3.
+	Elitism *uint
 
 	// SelectionAlgorithm is the algorithm used to select solutions from the
-	// solution pool for crossover.
-	SelectionAlgorithm selector.Algorithm
+	// solution pool for crossover. The default value is selection.SCX.
+	SelectionAlgorithm selection.Algorithm
 
 	// CombinationAlgorithms is a slice of algortihms used to combine the
 	// selected solutions into the solution candidates. The combination
-	// algorithms are applied sequentially.
+	// algorithms are applied sequentially. the default value is
+	// []combination.Algorithm{combination.CROSSOVER_SINGLE_POINT}
 	CombinationAlgorithms []combination.Algorithm
 
 	// ThreadCount sets the amount of threads used by the genetic algorithm.
@@ -59,23 +71,32 @@ type Algorithm struct {
 }
 
 func (a *Algorithm) check() error {
-	switch {
-	case a.FFn == nil:
+	if a.FFn == nil {
 		return fmt.Errorf("Fitness function missing")
-	case a.SolutionBitSize == 0:
-		return fmt.Errorf("Solution size 0")
-	case a.SolutionPoolSize == 0:
-		return fmt.Errorf("Solution pool size 0")
-	case a.SelectionAlgorithm == "":
-		return fmt.Errorf("No selection algorithm selected")
-	case a.ThreadCount == 0:
-		return fmt.Errorf("Thread count set to 0")
-	default:
-		if a.Elitism > 100 {
-			a.Elitism = 100
-		}
-		return nil
 	}
+	if a.SolutionBitSize == 0 {
+		return fmt.Errorf("Solution size 0")
+	}
+	if a.SolutionPoolSize == 0 {
+		a.SolutionPoolSize = defaultPoolSize
+	}
+	if a.Elitism == nil {
+		a.Elitism = &defaultElitism
+	} else {
+		if *a.Elitism > 100 {
+			*a.Elitism = 100
+		}
+	}
+	if a.SelectionAlgorithm == "" {
+		a.SelectionAlgorithm = defaultSelectionAlg
+	}
+	if len(a.CombinationAlgorithms) == 0 {
+		a.CombinationAlgorithms = defaultCombinationAlg
+	}
+	if a.ThreadCount == 0 {
+		a.ThreadCount = defaultThreadCount
+	}
+	return nil
 }
 
 // Result contains the result of a genetic algorithm and also additional
@@ -92,15 +113,8 @@ type Result struct {
 // which determines how many bits the solution must include.
 func New(fn FitnessFn, sbl uint) *Algorithm {
 	return &Algorithm{
-		FFn:                fn,
-		SolutionBitSize:    sbl,
-		SolutionPoolSize:   1000,
-		SelectionAlgorithm: selector.SCX,
-		Elitism:            3,
-		CombinationAlgorithms: []combination.Algorithm{
-			combination.CROSSOVER_SINGLE_POINT,
-		},
-		ThreadCount: uint(runtime.NumCPU()),
+		FFn:             fn,
+		SolutionBitSize: sbl,
 	}
 }
 
@@ -123,7 +137,7 @@ func (a *Algorithm) Run(g Goal) (ret Result, err error) {
 		return
 	}
 
-	sel, err := selector.New(a.SelectionAlgorithm, a.Elitism)
+	sel, err := selection.New(a.SelectionAlgorithm, *a.Elitism)
 	if err != nil {
 		return
 	}
@@ -131,7 +145,7 @@ func (a *Algorithm) Run(g Goal) (ret Result, err error) {
 	var combiners []combination.Combiner
 	for _, comb := range a.CombinationAlgorithms {
 		var c combination.Combiner
-		if c, err = combination.New(comb, a.Elitism); err != nil {
+		if c, err = combination.New(comb, *a.Elitism); err != nil {
 			return
 		}
 		combiners = append(combiners, c)
