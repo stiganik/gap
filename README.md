@@ -1,4 +1,4 @@
-Genetic Algorithm Project. (GAP)
+Genetic Algorithm Project. (GAP v0.1)
 
 This project aims to implement a Go based genetic algorithm package. The interface is designed to be simple to use for both beginners (default values) and advanced users (customizable).
 
