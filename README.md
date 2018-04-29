@@ -28,10 +28,12 @@ func Fitness(s []byte) uint {
 }
 
 func main() {
-    solutionBits := uint(8)
-    alg := gap.New(Fitness, solutionBits)
+    alg := gap.Algorithm {
+        FFn: Fitness,
+        SolutionBitSize: uint(8),
+    }
 
-    goal := gap.Goal{
+    goal := gap.Goal {
         Goals: gap.TIME | gap.FITNESS,
         TimeN: 1 * time.Minute,
         FitN:  255,
@@ -76,6 +78,16 @@ Currently implemented algorithms.
 - Flip bit mutation - The flip bit string mutation algorithm flips all the
   bits in the bitstring without looking into it further.
   https://en.wikipedia.org/wiki/Mutation_(genetic_algorithm)
+
+## Constructor
+
+While the `Algorithm` structure is usually initialized manually, the package does provide a constructor in case you need a function to create a new algorithm for whatever reason. The function has the signature:
+
+```go
+func New(fn FitnessFn, sbl uint) *Algorithm
+```
+
+where `sbl` is the solution bit size.
 
 ## Customization
 
@@ -165,11 +177,11 @@ gap.Algorithm{
 
 #### Elitism
 
-Elitism is a value between 0 and 100 that determines which percentage of the best solutions of each generation pass on to the next generation unaltered. By default this value is set to `3`.
+Elitism is a pointer to a value between 0 and 100 that determines which percentage of the best solutions of each generation pass on to the next generation unaltered. By default this value is set to `3`.
 
 ```go
 gap.Algorithm{
-    Elitism: 10, // 10% of the elite pass on without selection and altering
+    Elitism: &uint(10), // 10% of the elite pass on without selection and altering
 }
 ```
 
@@ -212,13 +224,15 @@ func Fitness(s []byte) uint {
 }
 
 func main() {
-    alg := gap.New(Fitness, sbl)
-
-    alg.SolutionPoolSize = 10000
-    alg.Elitism = 10
-    alg.CombinationAlgorithms = []combination.Algorithm{
-        combination.CROSSOVER_SINGLE_POINT,
-        combination.MUTATION_BIT_STRING,
+    alg := gap.Algorithm{
+        FFn:              Fitness,
+        SolutionBitSize:  sbl,
+        SolutionPoolSize: 10000,
+        Elitism:          &uint(10),
+        CombinationAlgorithms: []combination.Algorithm{
+            combination.CROSSOVER_SINGLE_POINT,
+            combination.MUTATION_BIT_STRING,
+        },
     }
 }
 ```
