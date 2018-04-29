@@ -7,12 +7,12 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/stiganik/gap/selector"
+	"github.com/stiganik/gap/selection"
 	"github.com/stiganik/gap/solution"
 )
 
 func init() {
-	selector.Register(selector.SCX, New)
+	selection.Register(selection.SCX, New)
 }
 
 type scx struct {
@@ -21,7 +21,7 @@ type scx struct {
 }
 
 // New creates an instance of the fitness proportionate selection algorithm.
-func New(elitism uint) (selector.Selector, error) {
+func New(elitism uint) (selection.Selector, error) {
 	scx := &scx{
 		elitism: elitism,
 		rnd:     rand.New(rand.NewSource(time.Now().UnixNano())),

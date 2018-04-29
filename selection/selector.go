@@ -1,7 +1,7 @@
 /*
-Package selector is the interface package for all selection algorithms.
+Package selection is the interface package for all selection algorithms.
 */
-package selector
+package selection
 
 import (
 	"fmt"

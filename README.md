@@ -188,11 +188,11 @@ gap.Algorithm{
 
 #### Selection algorithm
 
-The selection algorithm determines which algorithm is used to choose solutions from the possible solutions into the next generation. By default this value is set to `selector.SCX`
+The selection algorithm determines which algorithm is used to choose solutions from the possible solutions into the next generation. By default this value is set to `selection.SCX`
 
 ```go
 gap.Algorithm{
-    SelectionAlgorithm: selector.SCX, // Use fitness proportionate selection algorithm
+    SelectionAlgorithm: selection.SCX, // Use fitness proportionate selection algorithm
 }
 ```
 

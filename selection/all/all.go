@@ -8,5 +8,5 @@ import (
 	// Blank importing all algorithms forces the algorithms to register
 	// themselves at runtime saving the trouble of having to import all
 	// algorithms one by one.
-	_ "github.com/stiganik/gap/selector/scx"
+	_ "github.com/stiganik/gap/selection/scx"
 )

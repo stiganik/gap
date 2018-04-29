@@ -10,19 +10,19 @@ import (
 	"time"
 
 	"github.com/stiganik/gap/combination"
-	"github.com/stiganik/gap/selector"
+	"github.com/stiganik/gap/selection"
 	"github.com/stiganik/gap/solution"
 
 	// Statically import all selection and combination algorithms to make
 	// them register themselves at runtime.
 	_ "github.com/stiganik/gap/combination/all"
-	_ "github.com/stiganik/gap/selector/all"
+	_ "github.com/stiganik/gap/selection/all"
 )
 
 var (
 	defaultPoolSize       = uint(1000)
 	defaultElitism        = uint(3)
-	defaultSelectionAlg   = selector.SCX
+	defaultSelectionAlg   = selection.SCX
 	defaultCombinationAlg = []combination.Algorithm{
 		combination.CROSSOVER_SINGLE_POINT,
 	}
@@ -54,8 +54,8 @@ type Algorithm struct {
 	Elitism *uint
 
 	// SelectionAlgorithm is the algorithm used to select solutions from the
-	// solution pool for crossover. The default value is selector.SCX.
-	SelectionAlgorithm selector.Algorithm
+	// solution pool for crossover. The default value is selection.SCX.
+	SelectionAlgorithm selection.Algorithm
 
 	// CombinationAlgorithms is a slice of algortihms used to combine the
 	// selected solutions into the solution candidates. The combination
@@ -137,7 +137,7 @@ func (a *Algorithm) Run(g Goal) (ret Result, err error) {
 		return
 	}
 
-	sel, err := selector.New(a.SelectionAlgorithm, *a.Elitism)
+	sel, err := selection.New(a.SelectionAlgorithm, *a.Elitism)
 	if err != nil {
 		return
 	}
